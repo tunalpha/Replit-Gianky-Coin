@@ -11,6 +11,14 @@ const ParticleBackground = () => {
     fullScreen: { enable: true, zIndex: 0 },
     background: { color: { value: 'transparent' } },
     fpsLimit: 60,
+    interactivity: {
+      detectsOn: 'none',
+      events: {
+        onClick: { enable: false },
+        onHover: { enable: false },
+        resize: true,
+      },
+    },
     particles: {
       color: { value: ['#00F0FF', '#7000FF'] },
       links: {
