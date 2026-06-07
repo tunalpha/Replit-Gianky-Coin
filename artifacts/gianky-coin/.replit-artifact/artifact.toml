@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Gianky Coin"
+version = "1.0.0"
+id = "artifacts/gianky-coin"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25739
+
+[services.development]
+run = "pnpm --filter @workspace/gianky-coin run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/gianky-coin", "run", "build" ]
+publicDir = "artifacts/gianky-coin/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25739"
+BASE_PATH = "/"
