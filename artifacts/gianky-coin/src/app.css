@@ -28,13 +28,16 @@
 
 html {
   scroll-behavior: smooth;
+  /* overflow-x: clip is safe on iOS — does NOT block vertical scroll like overflow-x: hidden does */
+  overflow-x: clip;
 }
 
 body {
   font-family: 'Outfit', sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  overflow-x: hidden;
+  /* Do NOT set overflow-x: hidden on body — on iOS Safari it blocks vertical scrolling entirely */
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

@@ -1,14 +1,20 @@
-import { useCallback, useMemo } from 'react';
-import Particles from '@tsparticles/react';
+import { useEffect, useState, useMemo } from 'react';
+import Particles, { initParticlesEngine } from '@tsparticles/react';
 import { loadSlim } from '@tsparticles/slim';
 
 const ParticleBackground = () => {
-  const particlesInit = useCallback(async (engine) => {
-    await loadSlim(engine);
+  const [engineReady, setEngineReady] = useState(false);
+
+  useEffect(() => {
+    initParticlesEngine(async (engine) => {
+      await loadSlim(engine);
+    }).then(() => {
+      setEngineReady(true);
+    });
   }, []);
 
   const options = useMemo(() => ({
-    fullScreen: { enable: true, zIndex: 0 },
+    fullScreen: { enable: false },
     background: { color: { value: 'transparent' } },
     fpsLimit: 60,
     interactivity: {
@@ -61,12 +67,26 @@ const ParticleBackground = () => {
     detectRetina: true,
   }), []);
 
+  if (!engineReady) return null;
+
   return (
-    <Particles
-      id="tsparticles"
-      init={particlesInit}
-      options={options}
-    />
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        zIndex: 0,
+        pointerEvents: 'none',
+      }}
+    >
+      <Particles
+        id="tsparticles"
+        options={options}
+        style={{ width: '100%', height: '100%' }}
+      />
+    </div>
   );
 };
 
