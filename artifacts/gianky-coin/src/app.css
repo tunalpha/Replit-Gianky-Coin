@@ -1,8 +1,5 @@
+@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@200;400;600;900&family=Rajdhani:wght@300;500;700&family=Outfit:wght@300;400;600&family=JetBrains+Mono:wght@400&display=swap');
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 :root {
   --bg-primary: #050505;
@@ -28,18 +25,20 @@
 
 html {
   scroll-behavior: smooth;
-  /* overflow-x: clip is safe on iOS — does NOT block vertical scroll like overflow-x: hidden does */
-  overflow-x: clip;
 }
 
 body {
   font-family: 'Outfit', sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  /* Do NOT set overflow-x: hidden on body — on iOS Safari it blocks vertical scrolling entirely */
-  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Contain horizontal overflow at the app root — NOT on body/html which breaks iOS Safari scroll */
+#root {
+  overflow-x: hidden;
+  min-height: 100dvh;
 }
 
 .font-heading {
