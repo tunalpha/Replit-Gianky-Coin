@@ -6,7 +6,7 @@ import { usePolPrice } from '@/components/PolPriceContext';
 
 // Video NFT per ogni piano
 const nftVideos = {
-  starter: 'https://customer-assets.emergentagent.com/job_gky-crypto/artifacts/mjw3v76i_1957575147158205420.mov',
+  starter: 'https://customer-assets.emergentagent.com/job_gky-crypto/artifacts/tbvfngzj_121238905977770762.mp4',
   basic: 'https://customer-assets.emergentagent.com/job_gky-crypto/artifacts/tbvfngzj_121238905977770762.mp4',
   standard: 'https://customer-assets.emergentagent.com/job_gky-crypto/artifacts/ht0ulmxg_618031375706676201.mp4',
   vip: 'https://customer-assets.emergentagent.com/job_gky-crypto/artifacts/wiu2wvv8_-4358462022762962354.mp4',

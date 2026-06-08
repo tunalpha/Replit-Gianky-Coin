@@ -42,7 +42,7 @@ const MintingPage = () => {
         src={MINTING_URL}
         title="Piattaforma Minting GiankyCoin"
         className="w-full h-full border-0"
-        allow="clipboard-write; encrypted-media"
+        allow="clipboard-write; encrypted-media; camera; microphone; payment; web-share; publickey-credentials-get"
         allowFullScreen
         data-testid="minting-iframe"
       />
