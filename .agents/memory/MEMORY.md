@@ -1,0 +1,2 @@
+- [Mint mobile wallet fix](mint-mobile-wallet.md) — useNftMint must use ethers5Adapter not window.ethereum; window.ethereum is undefined on mobile without extension
+- [Monorepo @types/react conflict](types-react-override.md) — pin @types/react=18.3.31 via pnpm.overrides in root package.json to fix ReactNode/bigint TS error in Next.js+Thirdweb builds

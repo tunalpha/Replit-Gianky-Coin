@@ -13,6 +13,10 @@
     "id": "../../../node_modules/.pnpm/ox@0.14.29_typescript@5.9.3_zod@3.25.76/node_modules/ox/_esm/tempo/internal/virtualMasterPool.js -> ./mine.wasm.js",
     "files": []
   },
+  "../../../node_modules/.pnpm/thirdweb@5.120.0_@solana+sysvars@5.5.1_typescript@5.9.3__@tanstack+query-core@5.100.9_@_1fd02b46305ab8a8ebf66bf5a9a0d2f5/node_modules/thirdweb/dist/esm/adapters/ethers5.js -> ../contract/actions/resolve-abi.js": {
+    "id": "../../../node_modules/.pnpm/thirdweb@5.120.0_@solana+sysvars@5.5.1_typescript@5.9.3__@tanstack+query-core@5.100.9_@_1fd02b46305ab8a8ebf66bf5a9a0d2f5/node_modules/thirdweb/dist/esm/adapters/ethers5.js -> ../contract/actions/resolve-abi.js",
+    "files": []
+  },
   "../../../node_modules/.pnpm/thirdweb@5.120.0_@solana+sysvars@5.5.1_typescript@5.9.3__@tanstack+query-core@5.100.9_@_1fd02b46305ab8a8ebf66bf5a9a0d2f5/node_modules/thirdweb/dist/esm/chains/constants.js -> ./utils.js": {
     "id": "../../../node_modules/.pnpm/thirdweb@5.120.0_@solana+sysvars@5.5.1_typescript@5.9.3__@tanstack+query-core@5.100.9_@_1fd02b46305ab8a8ebf66bf5a9a0d2f5/node_modules/thirdweb/dist/esm/chains/constants.js -> ./utils.js",
     "files": []
@@ -7059,6 +7063,22 @@
     "id": "components/payment-options.tsx -> ethers",
     "files": [
       "static/chunks/_app-pages-browser_node_modules_pnpm_ethers_5_8_0_bufferutil_4_1_0_utf-8-validate_5_0_10_node-47ee2f.js"
+    ]
+  },
+  "hooks/useNftMint.ts -> @/lib/thirdweb": {
+    "id": "hooks/useNftMint.ts -> @/lib/thirdweb",
+    "files": []
+  },
+  "hooks/useNftMint.ts -> thirdweb/adapters/ethers5": {
+    "id": "hooks/useNftMint.ts -> thirdweb/adapters/ethers5",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_pnpm_thirdweb_5_120_0__solana_sysvars_5_5_1_typescript_5_9_3_-5aef48.js"
+    ]
+  },
+  "hooks/useNftMint.ts -> thirdweb/chains": {
+    "id": "hooks/useNftMint.ts -> thirdweb/chains",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_pnpm_thirdweb_5_120_0__solana_sysvars_5_5_1_typescript_5_9_3_-593c6c.js"
     ]
   }
 }
