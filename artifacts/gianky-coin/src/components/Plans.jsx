@@ -4,14 +4,14 @@ import { Rocket, Zap, Star, Crown, Diamond, Gem, Sparkles, ArrowUpRight } from '
 import { useLanguage } from '@/i18n/LanguageContext';
 import { usePolPrice } from '@/components/PolPriceContext';
 
-// Video NFT per ogni piano
+// Video NFT per ogni piano — file locali in /public/NFT/
 const nftVideos = {
-  starter: 'https://customer-assets.emergentagent.com/job_gky-crypto/artifacts/tbvfngzj_121238905977770762.mp4',
-  basic: 'https://customer-assets.emergentagent.com/job_gky-crypto/artifacts/tbvfngzj_121238905977770762.mp4',
-  standard: 'https://customer-assets.emergentagent.com/job_gky-crypto/artifacts/ht0ulmxg_618031375706676201.mp4',
-  vip: 'https://customer-assets.emergentagent.com/job_gky-crypto/artifacts/wiu2wvv8_-4358462022762962354.mp4',
-  premium: 'https://customer-assets.emergentagent.com/job_gky-crypto/artifacts/if58ddk6_7659601308957236212.mp4',
-  diamond: 'https://customer-assets.emergentagent.com/job_gky-crypto/artifacts/5z9wo0a3_-5652636414198735992.mp4',
+  starter: '/NFT/Starter_NFT.mp4',
+  basic: '/NFT/Basic_NFT.mp4',
+  standard: '/NFT/Standard_NFT.mp4',
+  vip: '/NFT/VIP_NFT.mp4',
+  premium: '/NFT/Premium_NFT.mp4',
+  diamond: '/NFT/Diamond_NFT.mp4',
 };
 
 const plans = [
