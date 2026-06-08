@@ -1,1 +1,0 @@
-"use strict";exports.id=35509,exports.ids=[35509],exports.modules={35509:(e,t,o)=>{o.r(t),o.d(t,{default:()=>i});let i={connecting:"スマートアカウントに接続中",failedToConnect:"スマートアカウントへの接続に失敗しました",wrongNetworkScreen:{failedToSwitch:"ネットワークの切り替えに失敗しました",subtitle:"ウォレットが必要なネットワークに接続されていません",title:"ネットワークが違います"}}}};

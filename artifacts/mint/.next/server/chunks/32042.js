@@ -1,1 +1,0 @@
-"use strict";exports.id=32042,exports.ids=[32042],exports.modules={32042:(e,t,o)=>{o.r(t),o.d(t,{default:()=>i});let i={connecting:"正在连接智能账户",failedToConnect:"连接智能账户失败",wrongNetworkScreen:{failedToSwitch:"网络切换失败",subtitle:"钱包未连接至所需网络",title:"网络错误"}}}};
