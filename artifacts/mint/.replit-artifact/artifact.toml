@@ -1,0 +1,22 @@
+kind = "web"
+previewPath = "/mint/"
+title = "Gianky Mint"
+version = "1.0.0"
+id = "artifacts/mint"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/mint/" ]
+localPort = 20509
+
+[services.development]
+run = "pnpm --filter @workspace/mint run dev"
+
+[services.env]
+PORT = "20509"
+BASE_PATH = "/mint/"

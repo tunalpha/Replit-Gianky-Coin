@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 
-const MINTING_URL = 'https://neon-landing-4.emergent.host/';
+const MINTING_URL = '/mint/';
 
 const MintingPage = () => {
   const [isHovered, setIsHovered] = useState(false);
