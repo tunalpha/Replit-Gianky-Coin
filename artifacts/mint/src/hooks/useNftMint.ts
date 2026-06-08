@@ -232,15 +232,16 @@ export function useNftMint(isConnected?: boolean, address?: string, getProvider?
         }
       }
 
-      // Check if we're on the correct network first
-      const networkValid = await validateNetwork();
-      if (!networkValid) {
-        await handleNetworkSwitch();
-      }
-
-      // Ensure correct network
-      if (!isCorrectNetwork) {
-        await handleNetworkSwitch();
+      // Network check: skip for Thirdweb wallets (handled natively on mobile)
+      // Only call handleNetworkSwitch for legacy window.ethereum path
+      if (!thirdwebAccount) {
+        const networkValid = await validateNetwork();
+        if (!networkValid) {
+          await handleNetworkSwitch();
+        }
+        if (!isCorrectNetwork) {
+          await handleNetworkSwitch();
+        }
       }
 
       // ── Get signer (Thirdweb adapter or window.ethereum fallback) ─────────
@@ -598,7 +599,7 @@ export function useNftMint(isConnected?: boolean, address?: string, getProvider?
     } finally {
       setIsLoading(false);
     }
-  }, [isCorrectNetwork, handleNetworkSwitch]);
+  }, [isCorrectNetwork, handleNetworkSwitch, thirdwebAccount, isConnected, address]);
 
   return {
     mintNft,
