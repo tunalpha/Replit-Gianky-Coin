@@ -97,7 +97,7 @@ export function PaymentOptions() {
   // Debug logging
   console.log('PaymentOptions - Thirdweb values:', { isConnected, account, isConnecting });
   
-  const { mintNft, isLoading, handleNetworkSwitch, checkContractPrices } = useNftMint(isConnected, account, getProvider);
+  const { mintNft, isLoading, handleNetworkSwitch, checkContractPrices } = useNftMint(isConnected, account, getProvider, activeAccount);
   
   // Visual debugging for mobile
   const debugInfo = {

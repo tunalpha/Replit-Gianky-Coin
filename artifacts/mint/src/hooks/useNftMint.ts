@@ -14,7 +14,7 @@ import {
 
 // Using existing global type declarations from src/lib/types/
 
-export function useNftMint(isConnected?: boolean, address?: string, getProvider?: () => any) {
+export function useNftMint(isConnected?: boolean, address?: string, getProvider?: () => any, thirdwebAccount?: any) {
   const [isLoading, setIsLoading] = useState(false);
   const [isCorrectNetwork, setIsCorrectNetwork] = useState(false);
 
@@ -187,146 +187,49 @@ export function useNftMint(isConnected?: boolean, address?: string, getProvider?
     try {
       setIsLoading(true);
 
-      try {
-        console.log('Starting minting process...');
-        
-        // AppKit handles mobile wallet detection and connection
-        console.log('Using AppKit for wallet connection');
-        
-        // Check if we're on the client side
-        if (typeof window === 'undefined') {
-          console.log('Running on server side, skipping wallet checks');
-          showErrorAlert(
-            'Server Side Error',
-            'Please refresh the page and try again'
-          );
-          setIsLoading(false);
-          return;
-        }
-
-        // Check if wallet is connected via AppKit
-        console.log('AppKit connection status:', { isConnected, address });
-        console.log('(window as any).ethereum available:', !!(window as any).ethereum);
-        console.log('(window as any).ethereum type:', typeof (window as any).ethereum);
-
-        // Get provider from AppKit/Wagmi
-        let provider: any;
-        let walletConnected: boolean = !!(isConnected && address);
-        
-        console.log('🔍 Getting provider from AppKit...');
-        console.log('AppKit connection status:', { isConnected, address });
-        
-        // Try to get provider from AppKit/Wagmi
-        if (getProvider) {
-          provider = getProvider();
-          console.log('Provider from getProvider:', provider);
-        }
-        
-        if (!provider) {
-          console.error('❌ No provider available from AppKit');
-          showErrorAlert(
-            'Wallet Provider Not Found',
-            'Please refresh the page and try again. Make sure your wallet is properly connected.'
-          );
-          setIsLoading(false);
-          return;
-        }
-        
-        console.log('✅ Using provider:', provider);
-
-        // Now check wallet connection with the provider
-        console.log('🔍 Checking wallet connection with provider...');
-        console.log('Initial walletConnected status:', walletConnected);
-        
-        if (!walletConnected) {
-          console.log('AppKit shows not connected, checking with provider...');
-          try {
-            let accounts: string[] = [];
-            
-            if ((provider as any).chain?.id) {
-              // Wagmi walletClient - use the address directly
-              accounts = address ? [address] : [];
-            } else {
-              // (window as any).ethereum - request accounts
-              accounts = await (provider as any).request({ method: 'eth_accounts' }) as string[];
-            }
-            
-            walletConnected = !!(accounts && accounts.length > 0);
-            console.log('Provider accounts check:', { accounts, walletConnected });
-          } catch (error) {
-            console.log('Provider accounts check failed:', error);
+      // ── Wallet connection check ────────────────────────────────────────────
+      if (thirdwebAccount && isConnected && address) {
+        // Thirdweb handles wallet connection natively (works on mobile, in-app
+        // wallets, WalletConnect, etc.) — no window.ethereum needed.
+        console.log('✅ Thirdweb wallet detected, skipping legacy provider checks', { address });
+      } else {
+        // Legacy path: desktop MetaMask / injected window.ethereum
+        try {
+          if (typeof window === 'undefined') {
+            showErrorAlert('Server Side Error', 'Please refresh the page and try again');
+            setIsLoading(false);
+            return;
           }
-        }
-        
-        if (!walletConnected) {
-          console.log('❌ Wallet not connected after all checks');
-          showErrorAlert(
-          'Wallet Not Found',
-            'Please connect your Web3 wallet to continue'
-          );
+
+          const provider: any = getProvider ? getProvider() : null;
+          const walletConnected = !!(isConnected && address) || !!(provider && (window as any).ethereum);
+
+          if (!walletConnected) {
+            showErrorAlert('Wallet Not Found', 'Please connect your Web3 wallet to continue');
+            setIsLoading(false);
+            return;
+          }
+
+          if (provider && !thirdwebAccount) {
+            let chainIdDecimal: number;
+            if ((window as any).ethereum) {
+              const chainId = await (window as any).ethereum.request({ method: 'eth_chainId' });
+              chainIdDecimal = parseInt(chainId, 16);
+            } else {
+              chainIdDecimal = 137;
+            }
+            if (chainIdDecimal !== 137) {
+              showErrorAlert('Wrong Network', 'Please switch to Polygon Mainnet in your wallet');
+              setIsLoading(false);
+              return;
+            }
+          }
+        } catch (error: any) {
+          console.error('Wallet connection error:', error);
+          showErrorAlert('Wallet Connection Error', error.message || 'Please ensure your wallet is properly connected');
           setIsLoading(false);
           return;
         }
-        
-        console.log('✅ Wallet connection verified');
-
-        // Verify we're on Polygon network first
-        let chainId: string;
-        let chainIdDecimal: number;
-        
-        // Handle different provider types
-        if ((provider as any).chain?.id) {
-          // This is a Wagmi walletClient
-          console.log('Using Wagmi walletClient provider');
-          chainIdDecimal = (provider as any).chain.id;
-          chainId = '0x' + chainIdDecimal.toString(16);
-        } else {
-          // This is (window as any).ethereum
-          console.log('Using (window as any).ethereum provider');
-          chainId = await (provider as any).request({ method: 'eth_chainId' });
-          chainIdDecimal = parseInt(chainId as string, 16);
-        }
-        
-        console.log('Current network chainId:', chainId, 'Decimal:', chainIdDecimal);
-        
-        if (chainIdDecimal !== 137) { // Polygon Mainnet
-          showErrorAlert(
-            'Wrong Network',
-            'Please switch to Polygon Mainnet in your wallet'
-          );
-          setIsLoading(false);
-          return;
-        }
-
-        // Set the provider for future use
-        (window as any).ethereum = provider;
-        
-        // Initialize ethers provider to check connection
-        const ethersProvider = new ethers.providers.Web3Provider(provider);
-
-        // Request accounts to ensure connection and permissions
-        const accounts = await (provider as any).request({
-          method: 'eth_requestAccounts'  // This will prompt if not connected
-        }) as string[];
-        
-        if (!accounts || accounts.length === 0) {
-          showErrorAlert(
-            'Wallet Not Connected',
-            'Please connect your wallet first'
-          );
-          setIsLoading(false);
-          return;
-        }
-
-        console.log('Connected account:', accounts[0]);
-      } catch (error: any) {
-        console.error('Wallet connection error:', error);
-        showErrorAlert(
-          'Wallet Connection Error',
-          error.message || 'Please ensure your wallet is properly connected'
-        );
-        setIsLoading(false);
-        return;
       }
 
       // Check if we're on the correct network first
@@ -340,12 +243,29 @@ export function useNftMint(isConnected?: boolean, address?: string, getProvider?
         await handleNetworkSwitch();
       }
 
-      // Get signer
-      if (!(window as any).ethereum) {
-        throw new Error('No Web3 provider found');
+      // ── Get signer (Thirdweb adapter or window.ethereum fallback) ─────────
+      let provider: ethers.providers.Provider;
+      let signer: ethers.Signer;
+
+      if (thirdwebAccount) {
+        // Works for ALL wallet types: MetaMask, Trust Wallet, in-app wallets,
+        // WalletConnect on mobile — no window.ethereum needed.
+        const { ethers5Adapter } = await import('thirdweb/adapters/ethers5');
+        const { polygon } = await import('thirdweb/chains');
+        const { thirdwebClient } = await import('@/lib/thirdweb');
+        signer = await ethers5Adapter.signer.toEthers({
+          client: thirdwebClient,
+          chain: polygon,
+          account: thirdwebAccount,
+        });
+        provider = new ethers.providers.JsonRpcProvider('https://polygon-bor-rpc.publicnode.com');
+      } else if ((window as any).ethereum) {
+        const ethersProvider = new ethers.providers.Web3Provider((window as any).ethereum);
+        signer = ethersProvider.getSigner();
+        provider = ethersProvider;
+      } else {
+        throw new Error('No wallet connected. Please connect your wallet first.');
       }
-      const provider = new ethers.providers.Web3Provider((window as any).ethereum);
-      const signer = provider.getSigner();
 
       // Create contract instance with the full ABI
       const nftContract = new ethers.Contract(
