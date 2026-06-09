@@ -27,7 +27,7 @@ router.get("/pol-price", async (req, res) => {
       { signal: AbortSignal.timeout(10000) }
     );
     if (resp.ok) {
-      const data: Record<string, Record<string, number>> = await resp.json();
+      const data = await resp.json() as Record<string, Record<string, number>>;
       eurPrice = data["polygon-ecosystem-token"]?.eur ?? null;
       usdPrice = data["polygon-ecosystem-token"]?.usd ?? null;
     }
@@ -40,7 +40,7 @@ router.get("/pol-price", async (req, res) => {
         { signal: AbortSignal.timeout(10000) }
       );
       if (resp.ok) {
-        const data: Record<string, Record<string, Record<string, number>>> = await resp.json();
+        const data = await resp.json() as Record<string, Record<string, Record<string, number>>>;
         eurPrice = data.quotes?.EUR?.price ?? null;
         usdPrice = data.quotes?.USD?.price ?? null;
       }
@@ -74,7 +74,7 @@ router.get("/markets", async (req, res) => {
       { signal: AbortSignal.timeout(15000) }
     );
     if (resp.ok) {
-      const data: Array<Record<string, unknown>> = await resp.json();
+      const data = await resp.json() as Array<Record<string, unknown>>;
       const polPriceResp = await fetch("http://localhost:" + (process.env.PORT || 5000) + "/api/pol-price").then(r => r.json()).catch(() => DEFAULT_POL_PRICE) as { eur: number; usd: number };
       const eurUsdRate = polPriceResp.eur / polPriceResp.usd;
       for (const coin of data) {
@@ -102,7 +102,7 @@ router.get("/markets", async (req, res) => {
         signal: AbortSignal.timeout(15000),
       });
       if (resp.ok) {
-        const data: Array<Record<string, unknown>> = await resp.json();
+        const data = await resp.json() as Array<Record<string, unknown>>;
         const idMap: Record<string, string> = {
           "btc-bitcoin": "bitcoin", "eth-ethereum": "ethereum", "xrp-xrp": "ripple",
           "bnb-binance-coin": "binancecoin", "sol-solana": "solana", "ada-cardano": "cardano",
