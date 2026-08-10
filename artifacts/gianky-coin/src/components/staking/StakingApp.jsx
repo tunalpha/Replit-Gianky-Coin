@@ -17,7 +17,6 @@ import { TrendingUp, Coins, ExternalLink, RefreshCw, AlertTriangle } from 'lucid
 
 const STAKING_ADDRESS = '0xD38A9fF129788ff31B0b050ccBC34016397a10b4';
 const NFT_COLLECTION = '0x106fb804D03D4EA95CaeFA45C3215b57D8E6835D';
-const POLYGON_RPC = 'https://polygon-bor-rpc.publicnode.com';
 
 const wallets = [
   inAppWallet({
@@ -66,16 +65,33 @@ export default function StakingApp() {
   const [txHash, setTxHash] = useState('');
   const [loadingData, setLoadingData] = useState(false);
 
-  // Fetch staked items — read-only RPC, no signer needed
+  // Fetch staked items via backend proxy (Alchemy RPC server-side — no CORS, no rate limits)
   const fetchStakes = useCallback(async () => {
     if (!address || !isPolygon) return;
     try {
-      const provider = new ethers.providers.JsonRpcProvider(POLYGON_RPC);
-      const stakingContract = new ethers.Contract(STAKING_ADDRESS, STAKING_POOL_ABI, provider);
-      const result = await stakingContract.getUserStakes(address);
-      setStakedItems(result[0] || []);
+      const base = import.meta.env.BASE_URL?.replace(/\/$/, '') || '';
+      const res = await fetch(`${base}/api/stakes?address=${address}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      // Rebuild ethers BigNumber objects from serialized strings
+      const stakes = (data.stakes || []).map((s) => ({
+        tokenId: ethers.BigNumber.from(s.tokenId),
+        owner: s.owner,
+        lastClaimTime: ethers.BigNumber.from(s.lastClaimTime),
+        lockEndTime: ethers.BigNumber.from(s.lockEndTime),
+        planIndex: ethers.BigNumber.from(s.planIndex),
+        rewardRate: ethers.BigNumber.from(s.rewardRate),
+        priceUsedAtStake: ethers.BigNumber.from(s.priceUsedAtStake),
+      }));
+      setStakedItems(stakes);
+      if (stakes.length === 0) {
+        // Silently OK — user simply has no stakes from this address
+        console.log('No stakes found for', address);
+      }
     } catch (e) {
       console.error('fetchStakes error', e);
+      toast.error('Errore nel caricare gli stake: ' + (e?.message || 'Riprova'));
     }
   }, [address, isPolygon]);
 
