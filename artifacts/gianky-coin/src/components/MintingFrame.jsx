@@ -42,7 +42,7 @@ const MintingFrame = ({ isOpen, onClose }) => {
 
       {/* Iframe */}
       <iframe
-        src="https://gianky-minting.vercel.app/"
+        src="/mint/"
         title="GiankyCoin Minting Platform"
         className="w-full h-full pt-14"
         style={{ border: 'none' }}

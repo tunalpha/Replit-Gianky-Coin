@@ -2,18 +2,16 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Coins, Lock, TrendingUp, Clock, Copy, Check } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
-import { usePolPrice } from '@/components/PolPriceContext';
 
-const STAKING_CONTRACT = '0x106fb804D03D4EA95CaeFA45C3215b57D8E6835D';
+const NFT_CONTRACT = '0x106fb804D03D4EA95CaeFA45C3215b57D8E6835D';
+const STAKING_CONTRACT = '0xD38A9fF129788ff31B0b050ccBC34016397a10b4';
 const GKY_TOKEN_CONTRACT = '0x64487539aa9d61Bdc652A5755bbe30Ee96cFcEb2';
 
+// Piani reali dal contratto di staking on-chain (Polygon)
 const stakingPlans = [
-  { name: 'Starter', pol: 20, apy: 180, lockDays: 30, color: 'from-cyan-500 to-cyan-400' },
-  { name: 'Basic', pol: 50, apy: 180, lockDays: 30, color: 'from-blue-500 to-cyan-400' },
-  { name: 'Standard', pol: 100, apy: 180, lockDays: 30, color: 'from-purple-500 to-cyan-400' },
-  { name: 'VIP', pol: 500, apy: 180, lockDays: 30, color: 'from-amber-500 to-orange-400' },
-  { name: 'Premium', pol: 1000, apy: 180, lockDays: 30, color: 'from-pink-500 to-purple-400' },
-  { name: 'Diamond', pol: 5000, apy: 180, lockDays: 30, color: 'from-cyan-400 to-purple-500' },
+  { name: 'Bronze', lockDays: 90,  apy: 10, color: 'from-cyan-500 to-cyan-400' },
+  { name: 'Silver', lockDays: 180, apy: 12, color: 'from-purple-500 to-cyan-400' },
+  { name: 'Gold',   lockDays: 365, apy: 15, color: 'from-amber-500 to-orange-400' },
 ];
 
 const CopyButton = ({ text, label }) => {
@@ -51,7 +49,6 @@ const CopyButton = ({ text, label }) => {
 
 const Staking = () => {
   const { t, language } = useLanguage();
-  const { eurPrice, usdPrice, loading } = usePolPrice();
 
   const texts = {
     it: {
@@ -59,13 +56,13 @@ const Staking = () => {
       title: 'METTI IN',
       titleHighlight: 'STAKING',
       subtitle: 'Blocca il tuo NFT e ricevi ricompense proporzionali al periodo di staking. Più tempo blocchi, più guadagni!',
-      apy: 'APY',
-      lockPeriod: 'Periodo Lock',
+      apy: 'Rendimento',
+      lockPeriod: 'Durata Lock',
       days: 'giorni',
-      minInvestment: 'Investimento Min.',
       stakeNow: 'Stake Now',
       contracts: 'SMART CONTRACTS',
       nftContract: 'Contratto NFT',
+      stakingContract: 'Contratto Staking',
       tokenContract: 'Contratto GKY',
       features: [
         { icon: Coins, title: 'Token GKY', desc: 'Pagamento servizi in token GKY' },
@@ -79,13 +76,13 @@ const Staking = () => {
       title: 'START',
       titleHighlight: 'STAKING',
       subtitle: 'Lock your NFT and receive rewards proportional to the staking period. The longer you lock, the more you earn!',
-      apy: 'APY',
+      apy: 'Yield',
       lockPeriod: 'Lock Period',
       days: 'days',
-      minInvestment: 'Min. Investment',
       stakeNow: 'Stake Now',
       contracts: 'SMART CONTRACTS',
       nftContract: 'NFT Contract',
+      stakingContract: 'Staking Contract',
       tokenContract: 'GKY Contract',
       features: [
         { icon: Coins, title: 'GKY Token', desc: 'Service payments in GKY tokens' },
@@ -99,13 +96,13 @@ const Staking = () => {
       title: 'INICIA',
       titleHighlight: 'STAKING',
       subtitle: 'Bloquea tu NFT y recibe recompensas proporcionales al período de staking. ¡Más tiempo bloqueas, más ganas!',
-      apy: 'APY',
+      apy: 'Rendimiento',
       lockPeriod: 'Período Lock',
       days: 'días',
-      minInvestment: 'Inversión Mín.',
       stakeNow: 'Stake Ahora',
       contracts: 'SMART CONTRACTS',
       nftContract: 'Contrato NFT',
+      stakingContract: 'Contrato Staking',
       tokenContract: 'Contrato GKY',
       features: [
         { icon: Coins, title: 'Token GKY', desc: 'Pago de servicios en tokens GKY' },
@@ -119,13 +116,13 @@ const Staking = () => {
       title: 'COMMENCER LE',
       titleHighlight: 'STAKING',
       subtitle: 'Bloquez votre NFT et recevez des récompenses proportionnelles à la période de staking. Plus vous bloquez, plus vous gagnez!',
-      apy: 'APY',
+      apy: 'Rendement',
       lockPeriod: 'Période Lock',
       days: 'jours',
-      minInvestment: 'Investissement Min.',
       stakeNow: 'Stake Maintenant',
       contracts: 'SMART CONTRACTS',
       nftContract: 'Contrat NFT',
+      stakingContract: 'Contrat Staking',
       tokenContract: 'Contrat GKY',
       features: [
         { icon: Coins, title: 'Token GKY', desc: 'Paiement services en tokens GKY' },
@@ -139,13 +136,13 @@ const Staking = () => {
       title: 'STARTEN SIE',
       titleHighlight: 'STAKING',
       subtitle: 'Sperren Sie Ihr NFT und erhalten Sie Belohnungen proportional zur Staking-Periode. Je länger Sie sperren, desto mehr verdienen Sie!',
-      apy: 'APY',
+      apy: 'Rendite',
       lockPeriod: 'Lock-Periode',
       days: 'Tage',
-      minInvestment: 'Min. Investition',
       stakeNow: 'Jetzt Staken',
       contracts: 'SMART CONTRACTS',
       nftContract: 'NFT Vertrag',
+      stakingContract: 'Staking Vertrag',
       tokenContract: 'GKY Vertrag',
       features: [
         { icon: Coins, title: 'GKY Token', desc: 'Servicezahlung in GKY Tokens' },
@@ -159,13 +156,13 @@ const Staking = () => {
       title: 'НАЧНИТЕ',
       titleHighlight: 'СТЕЙКИНГ',
       subtitle: 'Заблокируйте NFT и получайте награды пропорционально периоду стейкинга. Чем дольше блокируете, тем больше зарабатываете!',
-      apy: 'APY',
+      apy: 'Доходность',
       lockPeriod: 'Период Блокировки',
       days: 'дней',
-      minInvestment: 'Мин. Инвестиция',
       stakeNow: 'Стейкать Сейчас',
       contracts: 'СМАРТ КОНТРАКТЫ',
       nftContract: 'Контракт NFT',
+      stakingContract: 'Контракт Стейкинга',
       tokenContract: 'Контракт GKY',
       features: [
         { icon: Coins, title: 'Токен GKY', desc: 'Оплата услуг в токенах GKY' },
@@ -179,13 +176,13 @@ const Staking = () => {
       title: '开始',
       titleHighlight: '质押',
       subtitle: '锁定您的NFT并获得与质押期成比例的奖励。锁定时间越长，收益越多！',
-      apy: 'APY',
+      apy: '收益率',
       lockPeriod: '锁定期',
       days: '天',
-      minInvestment: '最低投资',
       stakeNow: '立即质押',
       contracts: '智能合约',
       nftContract: 'NFT合约',
+      stakingContract: '质押合约',
       tokenContract: 'GKY合约',
       features: [
         { icon: Coins, title: 'GKY代币', desc: '用GKY代币支付服务费' },
@@ -274,17 +271,6 @@ const Staking = () => {
               {/* Details */}
               <div className="space-y-2 mb-6">
                 <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">{content.minInvestment}</span>
-                  <div className="text-right">
-                    <span className="text-white font-bold">{plan.pol} POL</span>
-                    {!loading && eurPrice && usdPrice && (
-                      <div className="text-xs text-green-400">
-                        ≈ €{(plan.pol * eurPrice).toFixed(2)} / ${(plan.pol * usdPrice).toFixed(2)}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="flex justify-between text-sm">
                   <span className="text-slate-400">{content.lockPeriod}</span>
                   <span className="text-white font-bold">{plan.lockDays} {content.days}</span>
                 </div>
@@ -311,8 +297,9 @@ const Staking = () => {
           <h3 className="font-subheading text-lg font-bold uppercase tracking-wider text-white mb-6 text-center">
             {content.contracts}
           </h3>
-          <div className="grid md:grid-cols-2 gap-4">
-            <CopyButton text={STAKING_CONTRACT} label={content.nftContract} />
+          <div className="grid md:grid-cols-3 gap-4">
+            <CopyButton text={NFT_CONTRACT} label={content.nftContract} />
+            <CopyButton text={STAKING_CONTRACT} label={content.stakingContract} />
             <CopyButton text={GKY_TOKEN_CONTRACT} label={content.tokenContract} />
           </div>
         </motion.div>

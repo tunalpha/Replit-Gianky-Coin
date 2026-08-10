@@ -10,7 +10,6 @@ import { Wallet, TrendingUp, Coins, ExternalLink, RefreshCw, AlertTriangle } fro
 
 const STAKING_ADDRESS = '0xD38A9fF129788ff31B0b050ccBC34016397a10b4';
 const NFT_COLLECTION = '0x106fb804D03D4EA95CaeFA45C3215b57D8E6835D';
-const ALCHEMY_KEY = import.meta.env.VITE_ALCHEMY_KEY || 'Xx_szvkGT0KJ5CT7ZdoHY';
 
 export default function StakingApp() {
   const { address, signer, isPolygon, connecting, error: walletError, connect, disconnect } = useWallet();
@@ -33,11 +32,12 @@ export default function StakingApp() {
     }
   }, [signer, address, isPolygon]);
 
-  // Fetch wallet NFTs from Alchemy
+  // Fetch wallet NFTs via backend proxy (keeps Alchemy key server-side)
   const fetchWalletNfts = useCallback(async () => {
     if (!address) return;
     try {
-      const url = `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}/getNFTs/?owner=${address}&contractAddresses[]=${NFT_COLLECTION}&withMetadata=false`;
+      const base = import.meta.env.BASE_URL?.replace(/\/$/, '') || '';
+      const url = `${base}/api/nfts?owner=${address}&contract=${NFT_COLLECTION}`;
       const res = await fetch(url);
       const data = await res.json();
       setWalletNfts(data.ownedNfts || []);
