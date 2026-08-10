@@ -354,7 +354,7 @@ export default function StakingApp() {
               {walletNfts.map((n) => (
                 <StakingNFTCard
                   key={n.id.tokenId}
-                  tokenId={parseInt(n.id.tokenId, 16)}
+                  tokenId={parseInt(n.id.tokenId, 10)}
                   isStaked={false}
                   signer={signer}
                   onTxSuccess={handleTxSuccess}
