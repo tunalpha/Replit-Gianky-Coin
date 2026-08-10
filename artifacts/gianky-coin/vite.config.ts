@@ -25,6 +25,9 @@ if (!basePath) {
 
 export default defineConfig({
   base: basePath,
+  define: {
+    global: "globalThis",
+  },
   plugins: [
     react(),
     ...(process.env.NODE_ENV !== "production" &&
