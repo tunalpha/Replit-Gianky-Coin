@@ -38,3 +38,8 @@ externalPort = 3002
 [[ports]]
 localPort = 25739
 externalPort = 3000
+
+[userenv]
+
+[userenv.shared]
+VITE_THIRDWEB_CLIENT_ID = "232af3b32b075da4510f105786f571fe"

@@ -1,8 +1,9 @@
 import { createThirdwebClient } from "thirdweb";
+import { defineChain } from "thirdweb/chains";
 
-// Client ID da Thirdweb Dashboard
-const clientId = import.meta.env.VITE_THIRDWEB_CLIENT_ID || "701cc72c7c405d65d9eedc7db4c742d2";
+const clientId = import.meta.env.VITE_THIRDWEB_CLIENT_ID || "232af3b32b075da4510f105786f571fe";
 
-export const thirdwebClient = createThirdwebClient({
-  clientId: clientId
-});
+export const thirdwebClient = createThirdwebClient({ clientId });
+
+// Polygon Mainnet
+export const polygonChain = defineChain(137);

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { ThirdwebProvider } from 'thirdweb/react';
 import '@/App.css';
 import { LanguageProvider } from '@/i18n/LanguageContext';
 import { PolPriceProvider } from '@/components/PolPriceContext';
@@ -79,21 +80,23 @@ function HomePage() {
 
 function App() {
   return (
-    <LanguageProvider>
-      <PolPriceProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/piattaforma-minting" element={<MintingPage />} />
-            <Route path="/acquista-pol" element={<AcquistaPolPage />} />
-            <Route path="/swap-crypto" element={<FixedFloatPage />} />
-            <Route path="/redotpay" element={<RedotPayPage />} />
-            <Route path="/staking-app" element={<StakingAppPage />} />
-            <Route path="/nft-wallet" element={<NftWalletPage />} />
-          </Routes>
-        </BrowserRouter>
-      </PolPriceProvider>
-    </LanguageProvider>
+    <ThirdwebProvider>
+      <LanguageProvider>
+        <PolPriceProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/piattaforma-minting" element={<MintingPage />} />
+              <Route path="/acquista-pol" element={<AcquistaPolPage />} />
+              <Route path="/swap-crypto" element={<FixedFloatPage />} />
+              <Route path="/redotpay" element={<RedotPayPage />} />
+              <Route path="/staking-app" element={<StakingAppPage />} />
+              <Route path="/nft-wallet" element={<NftWalletPage />} />
+            </Routes>
+          </BrowserRouter>
+        </PolPriceProvider>
+      </LanguageProvider>
+    </ThirdwebProvider>
   );
 }
 

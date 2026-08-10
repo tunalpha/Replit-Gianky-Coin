@@ -3,16 +3,62 @@ import { ethers } from 'ethers';
 import confetti from 'canvas-confetti';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useWallet } from '@/hooks/useWallet';
+import {
+  useActiveAccount,
+  useActiveWalletChain,
+  ConnectButton,
+  ConnectEmbed,
+} from 'thirdweb/react';
+import { createWallet, inAppWallet } from 'thirdweb/wallets';
+import { thirdwebClient, polygonChain } from '@/lib/thirdweb';
 import StakingNFTCard from './StakingNFTCard';
 import STAKING_POOL_ABI from '@/lib/StakingPool.json';
-import { Wallet, TrendingUp, Coins, ExternalLink, RefreshCw, AlertTriangle } from 'lucide-react';
+import { TrendingUp, Coins, ExternalLink, RefreshCw, AlertTriangle } from 'lucide-react';
 
 const STAKING_ADDRESS = '0xD38A9fF129788ff31B0b050ccBC34016397a10b4';
 const NFT_COLLECTION = '0x106fb804D03D4EA95CaeFA45C3215b57D8E6835D';
+const POLYGON_RPC = 'https://polygon-bor-rpc.publicnode.com';
+
+const wallets = [
+  inAppWallet({
+    auth: { options: ['email', 'google', 'apple', 'facebook'] },
+  }),
+  createWallet('io.metamask'),
+  createWallet('com.trustwallet.app'),
+  createWallet('com.coinbase.wallet'),
+  createWallet('com.safepal'),
+  createWallet('me.rainbow'),
+  createWallet('io.zerion.wallet'),
+];
 
 export default function StakingApp() {
-  const { address, signer, isPolygon, connecting, error: walletError, connect, disconnect } = useWallet();
+  const account = useActiveAccount();
+  const chain = useActiveWalletChain();
+
+  const address = account?.address ?? null;
+  const isPolygon = chain?.id === 137;
+
+  // Ethers v5 signer derived from ThirdWeb account (works on mobile, WalletConnect, in-app)
+  const [signer, setSigner] = useState(null);
+
+  useEffect(() => {
+    if (!account) { setSigner(null); return; }
+    let cancelled = false;
+    (async () => {
+      try {
+        const { ethers5Adapter } = await import('thirdweb/adapters/ethers5');
+        const s = await ethers5Adapter.signer.toEthers({
+          client: thirdwebClient,
+          chain: polygonChain,
+          account,
+        });
+        if (!cancelled) setSigner(s);
+      } catch (e) {
+        console.error('ethers5Adapter error', e);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [account]);
 
   const [walletNfts, setWalletNfts] = useState([]);
   const [stakedItems, setStakedItems] = useState([]);
@@ -20,19 +66,20 @@ export default function StakingApp() {
   const [txHash, setTxHash] = useState('');
   const [loadingData, setLoadingData] = useState(false);
 
-  // Fetch staked items from contract
+  // Fetch staked items — read-only RPC, no signer needed
   const fetchStakes = useCallback(async () => {
-    if (!signer || !address || !isPolygon) return;
+    if (!address || !isPolygon) return;
     try {
-      const stakingContract = new ethers.Contract(STAKING_ADDRESS, STAKING_POOL_ABI, signer);
+      const provider = new ethers.providers.JsonRpcProvider(POLYGON_RPC);
+      const stakingContract = new ethers.Contract(STAKING_ADDRESS, STAKING_POOL_ABI, provider);
       const result = await stakingContract.getUserStakes(address);
       setStakedItems(result[0] || []);
     } catch (e) {
       console.error('fetchStakes error', e);
     }
-  }, [signer, address, isPolygon]);
+  }, [address, isPolygon]);
 
-  // Fetch wallet NFTs via backend proxy (keeps Alchemy key server-side)
+  // Fetch wallet NFTs via backend proxy (Alchemy key stays server-side)
   const fetchWalletNfts = useCallback(async () => {
     if (!address) return;
     try {
@@ -46,7 +93,6 @@ export default function StakingApp() {
     }
   }, [address]);
 
-  // Load all data
   const loadData = useCallback(async () => {
     if (!address || !isPolygon) return;
     setLoadingData(true);
@@ -85,9 +131,7 @@ export default function StakingApp() {
     return parseFloat(ethers.utils.formatEther(total.mul(86400))).toFixed(2);
   }, [stakedItems]);
 
-  const handleTxSuccess = (hash) => {
-    setTxHash(hash);
-  };
+  const handleTxSuccess = (hash) => setTxHash(hash);
 
   // Claim all rewards
   const handleClaimAll = async () => {
@@ -110,39 +154,29 @@ export default function StakingApp() {
   if (!address) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#050505] px-4">
-        <div className="glass rounded-3xl p-10 text-center max-w-sm w-full">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center mx-auto mb-6">
-            <Wallet className="w-8 h-8 text-white" />
+        <div className="w-full max-w-sm">
+          <div className="text-center mb-8">
+            <h2 className="font-heading text-2xl font-bold text-white uppercase mb-2">
+              Staking <span className="gradient-text">GiankyCoin</span>
+            </h2>
+            <p className="text-slate-400 text-sm">
+              Connetti il tuo wallet per accedere allo staking NFT su Polygon.
+            </p>
           </div>
-          <h2 className="font-heading text-2xl font-bold text-white uppercase mb-3">
-            Staking <span className="gradient-text">GiankyCoin</span>
-          </h2>
-          <p className="text-slate-400 text-sm mb-8 leading-relaxed">
-            Connetti il tuo wallet MetaMask su rete Polygon per accedere allo staking.
-          </p>
-          {walletError && (
-            <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/20 rounded-xl p-3 mb-4 text-left">
-              <AlertTriangle className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
-              <p className="text-red-400 text-xs">{walletError}</p>
+          {/* ConnectEmbed works on mobile, WalletConnect, in-app wallets */}
+          <div className="relative">
+            <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-cyan-500 via-purple-500 to-cyan-500 opacity-30 blur-md" />
+            <div className="relative">
+              <ConnectEmbed
+                client={thirdwebClient}
+                chain={polygonChain}
+                wallets={wallets}
+                theme="dark"
+                showThirdwebBranding={false}
+                modalSize="compact"
+              />
             </div>
-          )}
-          <button
-            onClick={connect}
-            disabled={connecting}
-            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold uppercase tracking-wider text-sm hover:opacity-90 transition-opacity disabled:opacity-60"
-          >
-            {connecting ? 'Connessione…' : 'Connetti Wallet'}
-          </button>
-          {!window.ethereum && (
-            <a
-              href="https://metamask.io/download/"
-              target="_blank"
-              rel="noreferrer"
-              className="mt-4 block text-xs text-cyan-400 hover:underline"
-            >
-              Non hai MetaMask? Scaricalo qui →
-            </a>
-          )}
+          </div>
         </div>
       </div>
     );
@@ -155,13 +189,15 @@ export default function StakingApp() {
         <div className="glass rounded-3xl p-10 text-center max-w-sm w-full">
           <AlertTriangle className="w-12 h-12 text-amber-400 mx-auto mb-4" />
           <h2 className="font-heading text-xl font-bold text-white uppercase mb-3">Rete Errata</h2>
-          <p className="text-slate-400 text-sm mb-6">Devi essere su <span className="text-white font-bold">Polygon Mainnet</span> per usare lo staking.</p>
-          <button
-            onClick={connect}
-            className="w-full py-3.5 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-400 font-bold uppercase tracking-wider text-sm hover:bg-amber-500/30 transition-all"
-          >
-            Passa a Polygon
-          </button>
+          <p className="text-slate-400 text-sm mb-6">
+            Devi essere su <span className="text-white font-bold">Polygon Mainnet</span> per usare lo staking.
+          </p>
+          <ConnectButton
+            client={thirdwebClient}
+            chain={polygonChain}
+            wallets={wallets}
+            theme="dark"
+          />
         </div>
       </div>
     );
@@ -183,7 +219,7 @@ export default function StakingApp() {
               <span className="ml-2 text-green-400">● Polygon</span>
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <button
               onClick={loadData}
               disabled={loadingData}
@@ -192,18 +228,28 @@ export default function StakingApp() {
               <RefreshCw className={`w-3.5 h-3.5 ${loadingData ? 'animate-spin' : ''}`} />
               Aggiorna
             </button>
-            <button
-              onClick={disconnect}
-              className="px-3 py-2 glass rounded-xl text-slate-400 hover:text-white text-xs transition-all"
-            >
-              Disconnetti
-            </button>
+            {/* ThirdWeb ConnectButton — shows wallet details + disconnect */}
+            <ConnectButton
+              client={thirdwebClient}
+              chain={polygonChain}
+              wallets={wallets}
+              theme="dark"
+              detailsButton={{
+                style: {
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  borderRadius: '12px',
+                  padding: '8px 14px',
+                  color: 'white',
+                  fontSize: '12px',
+                },
+              }}
+            />
           </div>
         </div>
 
         {/* Stats Dashboard */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-          {/* Live rewards */}
           <div className="glass rounded-2xl p-6 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-green-500/10 rounded-full blur-2xl" />
             <p className="text-slate-400 text-xs font-mono uppercase tracking-widest mb-2">Rewards Disponibili</p>
@@ -213,7 +259,6 @@ export default function StakingApp() {
             </p>
           </div>
 
-          {/* Daily */}
           <div className="glass rounded-2xl p-6 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/10 rounded-full blur-2xl" />
             <p className="text-slate-400 text-xs font-mono uppercase tracking-widest mb-2">Entrate / Giorno</p>
@@ -223,7 +268,6 @@ export default function StakingApp() {
             </p>
           </div>
 
-          {/* Claim All */}
           <button
             onClick={handleClaimAll}
             disabled={parseFloat(liveReward) <= 0.000001}
@@ -244,9 +288,7 @@ export default function StakingApp() {
           </h2>
           {loadingData ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {[1, 2].map((i) => (
-                <div key={i} className="glass rounded-2xl h-64 animate-pulse" />
-              ))}
+              {[1, 2].map((i) => <div key={i} className="glass rounded-2xl h-64 animate-pulse" />)}
             </div>
           ) : stakedItems.length === 0 ? (
             <div className="glass rounded-2xl p-10 text-center">
@@ -279,13 +321,10 @@ export default function StakingApp() {
           </h2>
           {loadingData ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="glass rounded-2xl h-64 animate-pulse" />
-              ))}
+              {[1, 2, 3].map((i) => <div key={i} className="glass rounded-2xl h-64 animate-pulse" />)}
             </div>
           ) : walletNfts.length === 0 ? (
             <div className="glass rounded-2xl p-10 text-center">
-              <Wallet className="w-10 h-10 text-slate-600 mx-auto mb-3" />
               <p className="text-slate-400 text-sm mb-6">Nessun NFT GiankyCoin trovato in questo wallet.</p>
               <a
                 href="/piattaforma-minting"
