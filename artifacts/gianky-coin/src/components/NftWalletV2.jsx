@@ -726,16 +726,24 @@ const NftWalletInner = () => {
     try {
       // Add cache-busting timestamp to force fresh data
       const timestamp = Date.now();
-      const response = await fetch(`${API_URL}/api/nfts/${walletAddress}?contract_address=${NFT_CONTRACT_ADDRESS}&t=${timestamp}`);
+      const base = import.meta.env.BASE_URL?.replace(/\/$/, '') || '';
+      const response = await fetch(
+        `${base}/api/nfts?owner=${encodeURIComponent(walletAddress)}&contract=${encodeURIComponent(NFT_CONTRACT_ADDRESS)}&withMetadata=true&t=${timestamp}`
+      );
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
-      
-      if (data.success && data.nfts) {
-        setNfts(data.nfts.map(nft => ({
-          tokenId: nft.tokenId,
-          imageUrl: nft.imageUrl || LOGO_URL,
-          name: nft.name || `GiankyCoin #${nft.tokenId}`,
-          isStaked: false,
-        })));
+
+      if (data.ownedNfts) {
+        setNfts(data.ownedNfts.map(nft => {
+          const tokenId = parseInt(nft.id.tokenId, 10);
+          const image = nft.metadata?.image || nft.media?.[0]?.gateway || LOGO_URL;
+          return {
+            tokenId,
+            imageUrl: image,
+            name: nft.title || nft.metadata?.name || `GiankyCoin #${tokenId}`,
+            isStaked: false,
+          };
+        }));
       }
     } catch (error) {
       console.error('Error fetching NFTs:', error);

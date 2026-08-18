@@ -3,7 +3,7 @@ import { Router, type IRouter } from "express";
 const router: IRouter = Router();
 
 router.get("/nfts", async (req, res) => {
-  const { owner, contract } = req.query;
+  const { owner, contract, withMetadata } = req.query;
 
   if (!owner || typeof owner !== "string") {
     return res.status(400).json({ error: "Missing owner parameter" });
@@ -19,7 +19,8 @@ router.get("/nfts", async (req, res) => {
       contract && typeof contract === "string"
         ? `&contractAddresses[]=${encodeURIComponent(contract)}`
         : "";
-    const url = `https://polygon-mainnet.g.alchemy.com/v2/${alchemyKey}/getNFTs/?owner=${encodeURIComponent(owner)}${contractParam}&withMetadata=false`;
+    const metadataFlag = withMetadata === "true" ? "true" : "false";
+    const url = `https://polygon-mainnet.g.alchemy.com/v2/${alchemyKey}/getNFTs/?owner=${encodeURIComponent(owner)}${contractParam}&withMetadata=${metadataFlag}`;
 
     const response = await fetch(url);
     if (!response.ok) {
