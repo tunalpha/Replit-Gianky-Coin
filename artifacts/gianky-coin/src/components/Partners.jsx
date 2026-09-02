@@ -32,7 +32,7 @@ const Partners = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
           {/* YouTube */}
           <motion.a
-            href="https://www.youtube.com/@GKYOFFICIAL-r8m"
+            href="https://www.youtube.com/@GKYWEB3"
             target="_blank"
             rel="noopener noreferrer"
             initial={{ opacity: 0, y: 30 }}
